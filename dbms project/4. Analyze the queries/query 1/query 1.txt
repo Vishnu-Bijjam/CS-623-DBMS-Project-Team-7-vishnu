@@ -1,0 +1,20 @@
+The query selects the name, geometry type, and area of buildings from the gis_osm_buildings_a_free_1 table, excluding entries without a building name.
+
+The query utilizes the GeometryType function to identify the spatial geometry type of each entry (e.g., POLYGON, MULTIPOINT). It also calculates the area in square meters for each geometry using the ST_Area function on the geom column cast to geography type, assuming the data is stored using a geographic coordinate system like WGS 84 (EPSG:4326).
+
+QUERY PLAN:
+
+"Gather (cost=1000.00..409635.01 rows=51985 width=60)"
+" Workers Planned: 2"
+" Workers Launched: 2"
+" -> Parallel Seq Scan on gis_osm_buildings_a_free_1 (cost=0.00..403436.51 rows=21660 width=60)"
+" Filter: (name IS NOT NULL)"
+" Rows Removed by Filter: 1364711"
+
+The EXPLAIN ANALYZE output indicates that the query execution plan involves a parallel sequential scan (Parallel Seq Scan) of the gis_osm_buildings_a_free_1 table. Two worker processes are planned and launched to execute the query in parallel, aiming to improve performance.
+
+The filter name IS NOT NULL is applied to exclude records with null names. A significant number of rows (1,364,711) are removed by this filter, which suggests that many entries in the table do not have a building name.
+
+The cost estimate for the query starts at 1000.00 and goes up to 409635.01, with the actual time taken to execute the query ranging from 0.678 to 1056.140 milliseconds. The estimated number of rows to be returned is 51,985, and the average width of the rows (in bytes) is expected to be 60.
+
+Overall, the plan indicates that the query is not using indexes, which could be due to the absence of an index on the name column or the Postgres query planner determining that a sequential scan is more efficient for the given query.
